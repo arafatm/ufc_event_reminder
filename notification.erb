@@ -1,0 +1,6 @@
+<p>Hi</p>
+<p>This is a reminder that the following UFC event(s) are happening tomorrow</p>
+<ul>
+  <% @finder.events_happening_tomorrow.each do |event| %>
+    <li><%= event.name %></li>
+</ul>
