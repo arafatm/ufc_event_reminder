@@ -1,0 +1,9 @@
+<p><%= "Tracking #{@future_events.count} upcoming UFC events" %></p>
+<%= "Next event: #{@future_events.next_event.name} on #{@future_events.next_event.start_date}" %>
+
+<h1>Is there a UFC event tomorrow?</h1>
+<h1>
+  <strong>
+    <%= @future_events.happening_tomorrow.empty? ? 'NO' : 'YES' %>
+  </strong>
+</h1>

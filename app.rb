@@ -7,7 +7,12 @@ require 'pony'
 class Event
   attr_reader :name, :start_date
 
-  def initialize(html)
+  def initialize(name, start_date)
+    @name = name
+    @start_date = start_date
+  end
+
+  def self.initialize_from_html(html)
     @html = html
     @name = get_name
     @start_date = get_start_date
@@ -30,16 +35,37 @@ class EventCollection
   attr_reader :collection
 
   def initialize(arr)
-    @collection = arr
+    @collection = arr.sort{ |a, b| a.start_date <=> b.start_date }
   end
 
   def self.initialize_from_html(html)
     arr = []
     html.each do |tr|
-      arr << Event.new(tr)
+      arr << Event.initialize_from_html(tr)
     end
 
     new(arr)
+  end
+
+  def self.initialize_from_json(json)
+    arr = []
+    JSON.parse(json).each do |h|
+      arr << Event.new(h['name'], Date.parse(h['start_date']))
+    end
+
+    new(arr)
+  end
+
+  def happening_tomorrow
+    select { |e| e.start_date <= tomorrow  }
+  end
+
+  def tomorrow
+    DateTime.now.to_date.next_day
+  end
+
+  def next_event
+    @collection.first
   end
 
   def to_json
@@ -78,12 +104,7 @@ class EventFinder
     redis = Redis.new
     if @events
       redis.set 'future_events', @events.to_json
-      redis.set 'tomorrow_events', events_happening_tomorrow.to_json
     end
-  end
-
-  def events_happening_tomorrow
-    @events.select { |e| e.start_date <= tomorrow  }
   end
 
   def find_future_events
@@ -96,10 +117,6 @@ class EventFinder
     event_html = @page.css('tr[itemtype="http://schema.org/Event"]')
     EventCollection.initialize_from_html(event_html)
   end
-
-  def tomorrow
-    DateTime.now.to_date.next_day
-  end
 end
 
 class EventNotifier
@@ -108,11 +125,11 @@ class EventNotifier
   end
 
   def send_notifications
-    if !@finder.events_happening_tomorrow.empty?
+    if !@finder.events.happening_tomorrow.empty?
       Pony.mail :to => 'sachin@ranchod.co.za',
         :from => 'sachin@ranchod.co.za',
-        :subject => 'Howdy, Partna!',
-        :body => erb(:notification)
+        :subject => 'UFC event reminder',
+        :body => erb(:'emails/notification')
     end
   end
 end
