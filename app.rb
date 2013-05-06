@@ -101,7 +101,7 @@ class EventFinder
   end
 
   def store
-    redis = Redis.new
+    redis = AppRedis.create
     if @events
       redis.set 'future_events', @events.to_json
     end
@@ -132,4 +132,16 @@ class EventNotifier
         :body => erb(:'emails/notification')
     end
   end
+end
+
+class AppRedis
+  def self.create
+    if ENV["REDISCLOUD_URL"]
+      uri = URI.parse(ENV["REDISCLOUD_URL"])
+      Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
+    else
+      Redis.new
+    end
+  end
+
 end

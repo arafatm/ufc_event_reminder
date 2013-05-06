@@ -2,7 +2,7 @@ require './app'
 require 'sinatra'
 
 get '/' do
-  @redis ||= Redis.new
+  @redis ||= AppRedis.create
   unless @redis.get('future_events')
     ef = EventFinder.new
     ef.store
