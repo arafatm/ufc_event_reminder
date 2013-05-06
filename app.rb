@@ -13,17 +13,17 @@ class Event
   end
 
   def self.initialize_from_html(html)
-    @html = html
-    @name = get_name
-    @start_date = get_start_date
+    @name = self.get_name(html)
+    @start_date = self.get_start_date(html)
+    new(@name, @start_date)
   end
 
-  def get_name
-    @html.css('span[itemprop="name"]').first.children.first.text
+  def self.get_name(html)
+    html.css('span[itemprop="name"]').first.children.first.text
   end
 
-  def get_start_date
-    Date.parse(@html.css('meta[itemprop="startDate"]').first.attributes['content'])
+  def self.get_start_date(html)
+    Date.parse(html.css('meta[itemprop="startDate"]').first.attributes['content'])
   end
 
   def to_hash
