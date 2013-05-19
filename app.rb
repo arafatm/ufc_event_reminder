@@ -29,6 +29,24 @@ class Event
   def to_hash
     {}.tap { |h| h['name'] = @name; h['start_date'] = @start_date }
   end
+
+  def upcoming?
+    start_date >= tomorrow
+  end
+
+  def happening_tomorrow?
+    start_date <= tomorrow && start_date >= today
+  end
+
+  private
+  def tomorrow
+    today.next_day
+  end
+
+  def today
+    DateTime.now.to_date
+  end
+
 end
 
 class EventCollection
@@ -57,11 +75,11 @@ class EventCollection
   end
 
   def happening_tomorrow
-    select { |e| e.start_date <= tomorrow  }
+    select { |e| e.happening_tomorrow?  }
   end
 
-  def tomorrow
-    DateTime.now.to_date.next_day
+  def upcoming
+    select { |e| e.upcoming?  }
   end
 
   def next_event
@@ -97,19 +115,13 @@ class EventFinder
 
   def initialize
     @page = Nokogiri::HTML(open(URL))
-    @events = find_future_events
+    @events = find_all_events.upcoming
   end
 
   def store
     redis = AppRedis.create
     if @events
       redis.set 'future_events', @events.to_json
-    end
-  end
-
-  def find_future_events
-    find_all_events.select do |e|
-      e.start_date >= DateTime.now
     end
   end
 
@@ -153,5 +165,4 @@ class AppRedis
       Redis.new
     end
   end
-
 end

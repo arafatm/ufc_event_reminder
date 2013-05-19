@@ -1,4 +1,5 @@
 require './app'
+require 'sinatra'
 
 task :refresh_and_send_notifications do
   puts "Fetching UFC fights"

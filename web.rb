@@ -8,6 +8,7 @@ get '/' do
     ef.store
   end
 
-  @future_events = EventCollection.initialize_from_json(@redis.get('future_events'))
+  stored_events = EventCollection.initialize_from_json(@redis.get('future_events'))
+  @future_events = stored_events.upcoming
   erb(:'pages/index')
 end
