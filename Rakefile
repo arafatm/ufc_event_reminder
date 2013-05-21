@@ -1,12 +1,11 @@
 require './app'
-require 'sinatra'
 
 task :refresh_and_send_notifications do
   puts "Fetching UFC fights"
-  ef = EventFinder.new
-  puts "#{ef.events.count} upcoming fights"
-  ef.store
-
-  notifier = EventNotifier.new(ef)
-  notifier.send_notifications
+  upcoming = EventFinder.new.events.upcoming
+  puts "#{upcoming.count} upcoming fights"
+  Store.new.save_events(upcoming)
+  puts "saving events"
+  puts "sending any notifications"
+  EventNotifier.send_notifications(upcoming)
 end

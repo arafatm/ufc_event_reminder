@@ -7,3 +7,8 @@ gem "redis", "~> 3.0"
 gem "pony", "~> 1.4"
 gem 'shotgun'
 gem 'rake'
+
+group :development, :test do
+  gem 'rspec'
+  gem 'rack-test'
+end
