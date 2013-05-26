@@ -1,8 +1,14 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    addressable (2.3.4)
     diff-lcs (1.2.4)
+    email_spec (1.4.0)
+      launchy (~> 2.1)
+      mail (~> 2.2)
     i18n (0.6.4)
+    launchy (2.3.0)
+      addressable (~> 2.3)
     mail (2.5.3)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
@@ -42,6 +48,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  email_spec
   nokogiri (~> 1.5)
   pony (~> 1.4)
   rack-test

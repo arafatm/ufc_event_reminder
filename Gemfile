@@ -11,4 +11,5 @@ gem 'rake'
 group :development, :test do
   gem 'rspec'
   gem 'rack-test'
+  gem 'email_spec'
 end
